@@ -1050,7 +1050,9 @@ class VariantSelects extends HTMLElement {
       if (listOfAvailableOptions.includes(input.getAttribute('value'))) {
         input.innerText = input.getAttribute('value');
       } else {
-        input.innerText = window.variantStrings.unavailable_with_option.replace('[value]', input.getAttribute('value'));
+        // Modifying  dropdown to be unselected
+       // input.innerText = window.variantStrings.unavailable_with_option.replace('[value]', input.getAttribute('value'));
+        input.innerText = 'Unselected';
       }
     });
   }
@@ -1178,7 +1180,8 @@ class VariantSelects extends HTMLElement {
     const pricePerItem = document.getElementById(`Price-Per-Item-${this.dataset.section}`);
 
     if (!addButton) return;
-    addButtonText.textContent = window.variantStrings.unavailable;
+    
+    addButtonText.textContent = window.variantStrings.addToCart;
     if (price) price.classList.add('visibility-hidden');
     if (inventory) inventory.classList.add('visibility-hidden');
     if (sku) sku.classList.add('visibility-hidden');
