@@ -46,6 +46,17 @@ Usage:
   </div>
   {%- endfor -%}
 
+  <div class="select">
+    <select id="Option-{{ section.id }}-{{ forloop.index0 }}" class="select__select"
+      name="options[{{ option.name | escape }}]" form="{{ product_form_id }}">
+      {% if option.name == 'Size' %} <option selected="selected"> Unselected </option> {% endif %}
+      {% render 'product-variant-options', product: product, option: option, block: block %}
+    </select>
+    {% render 'icon-caret' %}
+  </div>
+  </div>
+  {%- endfor -%}
+
   <script type="application/json">
         {{ product.variants | json }}
       </script>
