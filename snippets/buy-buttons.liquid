@@ -68,6 +68,14 @@ show_pickup_availability: true %}
       assign quantity_rule_soldout = true
       endif
       -%}
+      {% if product.variants.size > 1 %}
+      <script defer="defer">
+        window.addEventListener('load', disableATC);
+        function disableATC() {
+          document.getElementById('ProductSubmitButton-{{ section_id }}').setAttribute('disabled', 'disabled');
+        };
+      </script>
+      {% endif %}
       <button id="ProductSubmitButton-{{ section_id }}" type="submit" name="add"
         class="product-form__submit button button--full-width {% if show_dynamic_checkout %}button--secondary{% else %}button--primary{% endif %}"
         {% if product.selected_or_first_available_variant.available==false or quantity_rule_soldout %} disabled {% endif
@@ -88,7 +96,9 @@ show_pickup_availability: true %}
       </button>
       <script defer="defer">
         window.onload = function () {
+          {% if option %}
           document.getElementById('ProductSubmitButton-{{ section_id }}').setAttribute('disabled', 'disabled');
+          {% endif %}
         };
       </script>
       {%- if show_dynamic_checkout -%}

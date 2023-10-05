@@ -192,8 +192,8 @@
         <div id="Quantity-Form-{{ section.id }}"
           class="product-form__input product-form__quantity{% if settings.inputs_shadow_vertical_offset != 0 and settings.inputs_shadow_vertical_offset < 0 %} product-form__quantity-top{% endif %}"
           {{ block.shopify_attributes }}>
-          {% comment %} TODO: enable theme-check once `item_count_for_variant` is accepted as valid filter
-          {% endcomment %}
+          {% comment %} TODO: enable theme-check once `item_count_for_variant` is accepted as valid filter {% endcomment
+          %}
           {% # theme-check-disable %}
           {%- assign cart_qty = cart | item_count_for_variant: product.selected_or_first_available_variant.id -%}
           {% # theme-check-enable %}
@@ -387,9 +387,95 @@
         block: block,
         share_link: share_url
         %}
-
         {%- when 'variant_picker' -%}
-        {% render 'product-variant-picker', product: product, block: block, product_form_id: product_form_id %}
+        {%- unless product.has_only_default_variant -%}
+        <variant-radios class="no-js-hidden" data-section="{{ section.id }}" data-url="{{ product.url }}" {{
+          block.shopify_attributes }}>
+          {%- for option in product.options_with_values -%}
+          <fieldset class="js product-form__input {% unless option.name == 'Color' %}hidden{% endunless %}">
+            <legend class="form__label">{{ option.name }}</legend>
+            {%- for value in option.values -%}
+            <input type="radio" id="{{ section.id }}-{{ option.position }}-{{ forloop.index0 }}"
+              name="{{ option.name }}" value="{{ value | escape }}" form="{{ product_form_id }}" {% if
+              option.selected_value==value %}checked{% endif %}>
+            <label for="{{ section.id }}-{{ option.position }}-{{ forloop.index0 }}" style="
+                               background-color:{{ value }} !important;">
+
+            </label>
+            {%- endfor -%}
+          </fieldset>
+          {%- endfor -%}
+          <script type="application/json">
+                    {{ product.variants | json }}
+                  </script>
+        </variant-radios>
+        <variant-selects class="no-js-hidden" data-section="{{ section.id }}" data-url="{{ product.url }}" {{
+          block.shopify_attributes }}>
+          {%- for option in product.options_with_values -%}
+          <div
+            class="product-form__input product-form__input--dropdown {% if option.name == 'Color' %}hidden{% endif %}">
+            <label class="form__label" for="Option-{{ section.id }}-{{ forloop.index0 }}">
+              {{ option.name }}
+            </label>
+            <div class="select">
+              <select id="Option-{{ section.id }}-{{ forloop.index0 }}" class="select__select"
+                name="options[{{ option.name | escape }}]" form="{{ product_form_id }}">
+                {%- assign has_size_option = false %}
+                <option value="" selected="selected">Unselected</option>
+                {%- for value in option.values -%}
+                {%- assign variant_index = forloop.index0 %}
+                {%- assign variant = product.variants[variant_index] %}
+                {%- if option.name == 'Size' %}
+                {%- assign has_size_option = true %}
+                <option value="{{ value | escape }}">
+                  {{ value }}
+                </option>
+                {%- else %}
+                <option value="{{ value | escape }}" {% if option.selected_value==value %}selected="selected" {% endif
+                  %}>
+                  {{ value }}
+                </option>
+                {%- endif %}
+                {%- endfor -%}
+                {%- if has_size_option == false %}
+                <option value="" {% if option.selected_value=='' %}selected="selected" {% endif %}>Unselected</option>
+                {# Add "Unselected" again if there are no size variants #}
+                {%- endif %}
+              </select>
+              {% render 'icon-caret' %}
+            </div>
+          </div>
+          {%- endfor -%}
+
+          <script type="application/json">
+    {{ product.variants | json }}
+  </script>
+        </variant-selects>
+
+        {%- endunless -%}
+
+        <noscript class="product-form__noscript-wrapper-{{ section.id }}">
+          <div class="product-form__input{% if product.has_only_default_variant %} hidden{% endif %}">
+            <label class="form__label" for="Variants-{{ section.id }}">{{ 'products.product.product_variants' | t
+              }}</label>
+            <div class="select">
+              <select name="id" id="Variants-{{ section.id }}" class="select__select" form="{{ product_form_id }}">
+                {%- for variant in product.variants -%}
+                <option {% if variant==product.selected_or_first_available_variant %}selected="selected" {% endif %} {%
+                  if variant.available==false %}disabled{% endif %} value="{{ variant.id }}">
+                  {{ variant.title }}
+                  {%- if variant.available == false %} - {{ 'products.product.sold_out' | t }}{% endif %}
+                  - {{ variant.price | money | strip_html }}
+                </option>
+                {%- endfor -%}
+              </select>
+              {% render 'icon-caret' %}
+            </div>
+          </div>
+        </noscript>
+        {% comment %} {%- when 'variant_picker' -%}
+        {% render 'product-variant-picker', product: product, block: block, product_form_id: product_form_id %} {%
+        endcomment %}
         {%- when 'buy_buttons' -%}
         {%- render 'buy-buttons', block: block, product: product, product_form_id: product_form_id, section_id:
         section.id, show_pickup_availability: true -%}
