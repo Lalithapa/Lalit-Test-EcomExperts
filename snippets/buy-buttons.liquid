@@ -88,9 +88,7 @@ show_pickup_availability: true %}
       </button>
       <script defer="defer">
         window.onload = function () {
-          {% if option %}
           document.getElementById('ProductSubmitButton-{{ section_id }}').setAttribute('disabled', 'disabled');
-          {% endif %}
         };
       </script>
       {%- if show_dynamic_checkout -%}
