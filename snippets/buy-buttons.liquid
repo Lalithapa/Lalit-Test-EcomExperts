@@ -77,7 +77,7 @@ show_pickup_availability: true %}
       </script>
       {% endif %}
       <button id="ProductSubmitButton-{{ section_id }}" type="submit" name="add"
-        class="product-form__submit button button--full-width {% if show_dynamic_checkout %}button--secondary{% else %}button--primary{% endif %}"
+        class="product-form__submit param_unselected button button--full-width {% if show_dynamic_checkout %}button--secondary{% else %}button--primary{% endif %}"
         {% if product.selected_or_first_available_variant.available==false or quantity_rule_soldout %} disabled {% endif
         %}>
         <span>
@@ -94,13 +94,6 @@ show_pickup_availability: true %}
           </svg>
         </div>
       </button>
-      <script defer="defer">
-        window.onload = function () {
-          {% if option %}
-          document.getElementById('ProductSubmitButton-{{ section_id }}').setAttribute('disabled', 'disabled');
-          {% endif %}
-        };
-      </script>
       {%- if show_dynamic_checkout -%}
       {{ form | payment_button }}
       {%- endif -%}
@@ -110,7 +103,8 @@ show_pickup_availability: true %}
   {%- else -%}
   <div class="product-form">
     <div class="product-form__buttons form">
-      <button type="submit" name="add" class="product-form__submit button button--full-width button--primary" disabled>
+      <button type="submit" name="add"
+        class="product-form__submit button button--full-width button--primary param_unselected" disabled>
         {{ 'products.product.sold_out' | t }}
       </button>
     </div>

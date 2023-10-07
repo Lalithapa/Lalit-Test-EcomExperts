@@ -965,10 +965,11 @@ class VariantSelects extends HTMLElement {
     this.updatePickupAvailability();
     this.removeErrorMessage();
     this.updateVariantStatuses();
-
-    if (!this.currentVariant) {
+    if (!this.currentVariant || !(document.querySelector('.atc_param').value) ) {
       this.toggleAddButton(true, '', true);
       this.setUnavailable();
+      this.renderProductInfo();
+      //this.updateMedia();
     } else {
       this.updateMedia();
       this.updateURL();
@@ -983,13 +984,23 @@ class VariantSelects extends HTMLElement {
   }
 
   updateMasterId() {
-    this.currentVariant = this.getVariantData().find((variant) => {
-      return !variant.options
-        .map((option, index) => {
-          return this.options[index] === option;
-        })
-        .includes(false);
-    });
+     const fieldset = document.querySelector("#color_param_data");
+
+   // Find the checked radio input within the fieldset
+    let swatchRadio = fieldset.querySelector("input[type='radio']:checked").value;
+    let sizeValue = document.querySelector(`.atc_param`).value;
+    let findVariant = `${swatchRadio} / ${sizeValue}`;
+    this.currentVariant = this.getVariantData().find((obj) => obj.title === findVariant);
+    if(this.currentVariant == undefined ){
+      this.currentVariant = this.getVariantData().find((obj) => obj.option1 == swatchRadio);
+    }
+    // this.currentVariant = this.getVariantData().find((variant) => {
+    //   return !variant.options
+    //     .map((option, index) => {
+    //       return this.options[index] === option;
+    //     })
+    //     .includes(false);
+    // });
   }
 
   updateMedia() {
@@ -997,14 +1008,16 @@ class VariantSelects extends HTMLElement {
     if (!this.currentVariant.featured_media) return;
 
     const mediaGalleries = document.querySelectorAll(`[id^="MediaGallery-${this.dataset.section}"]`);
-    mediaGalleries.forEach((mediaGallery) =>
-      mediaGallery.setActiveMedia(`${this.dataset.section}-${this.currentVariant.featured_media.id}`, true)
-    );
-
+    mediaGalleries.forEach((mediaGallery) => {
+      console.log(`${mediaGallery} ${this.dataset.section}  ${this.currentVariant.featured_media.id}`);
+      mediaGallery.setActiveMedia(`${this.dataset.section}-${this.currentVariant.featured_media.id}`, true);
+    });
     const modalContent = document.querySelector(`#ProductModal-${this.dataset.section} .product-media-modal__content`);
     if (!modalContent) return;
     const newMediaModal = modalContent.querySelector(`[data-media-id="${this.currentVariant.featured_media.id}"]`);
     modalContent.prepend(newMediaModal);
+     console.log(newMediaModal , "newmodal");
+   
   }
 
   updateURL() {
@@ -1079,6 +1092,7 @@ class VariantSelects extends HTMLElement {
 
   renderProductInfo() {
     const requestedVariantId = this.currentVariant.id;
+    console.log(requestedVariantId);
     const sectionId = this.dataset.originalSection ? this.dataset.originalSection : this.dataset.section;
 
     fetch(
@@ -1091,6 +1105,7 @@ class VariantSelects extends HTMLElement {
         if (this.currentVariant.id !== requestedVariantId) return;
 
         const html = new DOMParser().parseFromString(responseText, 'text/html');
+        console.log(html, "shows");
         const destination = document.getElementById(`price-${this.dataset.section}`);
         const source = html.getElementById(
           `price-${this.dataset.originalSection ? this.dataset.originalSection : this.dataset.section}`
@@ -1154,16 +1169,19 @@ class VariantSelects extends HTMLElement {
 
   toggleAddButton(disable = true, text, modifyClass = true) {
     const productForm = document.getElementById(`product-form-${this.dataset.section}`);
+    const atc_btn = document.getElementById(`ProductSubmitButton-${this.dataset.section}`);
     if (!productForm) return;
     const addButton = productForm.querySelector('[name="add"]');
     const addButtonText = productForm.querySelector('[name="add"] > span');
     if (!addButton) return;
-
     if (disable) {
       addButton.setAttribute('disabled', 'disabled');
       if (text) addButtonText.textContent = text;
+    } else if(document.querySelector('.atc_param').value == ""){
+      atc_btn.setAttribute('disabled', 'disabled');
     } else {
       addButton.removeAttribute('disabled');
+      atc_btn.removeAttribute('disabled');
       addButtonText.textContent = window.variantStrings.addToCart;
     }
 
@@ -1171,6 +1189,7 @@ class VariantSelects extends HTMLElement {
   }
 
   setUnavailable() {
+
     const button = document.getElementById(`product-form-${this.dataset.section}`);
     const addButton = button.querySelector('[name="add"]');
     const addButtonText = button.querySelector('[name="add"] > span');
