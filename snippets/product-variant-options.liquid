@@ -52,9 +52,7 @@ endfor
 <input type="radio" id="{{ section.id }}-{{ option.position }}-{{ forloop.index0 }}" name="{{ option.name }}"
   value="{{ value | escape }}" form="{{ product_form_id }}" {% if option.selected_value==value %} checked {% endif %} {%
   if option_disabled %} class="disabled" {% endif %}>
-<label {{ option | json }} for="{{ section.id }}-{{ option.position }}-{{ forloop.index0 }}" {% if
-  product.variants[forloop.index0].metafields.custom.color !=blank %} style="
-     background-color:{{ product.variants[forloop.index0].metafields.custom.color }} !important;" {% endif %}>
+<label {{ option | json }} for="{{ section.id }}-{{ option.position }}-{{ forloop.index0 }}">
   <span class="visually-hidden">{{ 'products.product.variant_sold_out_or_unavailable' | t }}</span>
 </label>
 {%- elsif block.settings.picker_type == 'dropdown' -%}
