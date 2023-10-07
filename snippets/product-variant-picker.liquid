@@ -34,11 +34,9 @@ Usage:
     <label class="form__label" for="Option-{{ section.id }}-{{ forloop.index0 }}">
       {{ option.name }}
     </label>
-
     <div class="select">
       <select id="Option-{{ section.id }}-{{ forloop.index0 }}" class="select__select"
         name="options[{{ option.name | escape }}]" form="{{ product_form_id }}">
-        {% if option.name == 'Size' %} <option selected="selected"> Unselected </option> {% endif %}
         {% render 'product-variant-options', product: product, option: option, block: block %}
       </select>
       {% render 'icon-caret' %}
@@ -60,9 +58,9 @@ Usage:
     </label>
     <div class="select">
       <select name="id" id="Variants-{{ section.id }}" class="select__select" form="{{ product_form_id }}">
-        <option selected="selected" disabled> Unselected </option>
         {%- for variant in product.variants -%}
-        <option {% if variant.available==false %} disabled {% endif %} value="{{ variant.id }}">
+        <option {% if variant==product.selected_or_first_available_variant %} selected="selected" {% endif %} {% if
+          variant.available==false %} disabled {% endif %} value="{{ variant.id }}">
           {%- liquid
           echo variant.title
           echo variant.price | money | strip_html | prepend: ' - '
@@ -90,7 +88,6 @@ Usage:
         {%- endfor -%}
       </select>
       {% render 'icon-caret' %}
-      <h1>Testing</h1>
     </div>
   </div>
 </noscript>
