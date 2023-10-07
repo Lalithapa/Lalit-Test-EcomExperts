@@ -968,8 +968,8 @@ class VariantSelects extends HTMLElement {
     if (!this.currentVariant || !(document.querySelector('.atc_param').value) ) {
       this.toggleAddButton(true, '', true);
       this.setUnavailable();
+      this.updateMedia();
       this.renderProductInfo();
-      //this.updateMedia();
     } else {
       this.updateMedia();
       this.updateURL();
